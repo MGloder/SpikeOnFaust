@@ -1,14 +1,13 @@
 import faust
 
-app = faust.App('exampleapp', broker='kafka://localhost')
+app = faust.App('exampleapp',
+                broker='kafka://localhost:9092',
+                value_serializer='raw')
+
+greeting_topic = app.topic('greetings')
 
 
-class Order(faust.Record):
-    account_id: str
-    amount: int
-
-
-@app.agent(value_type=Order)
-async def order(orders):
-    async for order in orders:
-        print(f'Order for {order.account_id}: {order.amount}')
+@app.agent(greeting_topic)
+async def greet(greetings):
+    async for greeting in greetings:
+        print(f'Order for {greeting}')
